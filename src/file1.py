@@ -21,7 +21,7 @@ X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_
 n_estimator = 50
 max_depth = 10   
 
-
+mlflow.set_experiment("MLOPS-exp1")  # Set the experiment name
 with mlflow.start_run():
 
     # Log parameters
