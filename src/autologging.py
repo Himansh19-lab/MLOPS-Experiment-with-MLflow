@@ -1,0 +1,64 @@
+import mlflow
+import mlflow.sklearn
+
+from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix   
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+import dagshub
+
+mlflow.set_tracking_uri("http://127.0.0.1:5000")
+
+wine = load_wine()
+x = wine.data
+y = wine.target
+
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)   
+
+# Define the model
+n_estimator = 100
+max_depth = 10   
+
+mlflow.autolog()  # Enable autologging for scikit-learn
+
+mlflow.set_experiment("wine_classification_experiment")
+
+with mlflow.start_run():
+
+    # Train the model
+    model = RandomForestClassifier(n_estimators=n_estimator, max_depth=max_depth, random_state=42)
+    model.fit(X_train, y_train)
+
+    y_pred = model.predict(X_test)
+
+    # Evaluate the model
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred, average='weighted')
+    recall = recall_score(y_test, y_pred, average='weighted')
+    f1 = f1_score(y_test, y_pred, average='weighted')
+
+
+
+    ## Creating a confusion matrix plot
+    cm = confusion_matrix(y_test, y_pred)
+    plt.figure(figsize=(6, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    plt.title("Confusion Matrix")
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+
+    # Save plot
+    plt.savefig("confusion_matrix.png")
+
+
+    mlflow.log_artifact(__file__)
+
+    # tags
+    mlflow.set_tags({"Author": "Himanshu", "Project": "Wine Classification"})
+   
+
+    print(f"accuracy: {accuracy}")
