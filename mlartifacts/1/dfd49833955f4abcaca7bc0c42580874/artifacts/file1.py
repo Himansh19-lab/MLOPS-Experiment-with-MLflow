@@ -21,7 +21,7 @@ X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_
 n_estimator = 50
 max_depth = 10   
 
-with mlflow.start_run(experiment_id=1):
+with mlflow.start_run(experiment_id=mlflow.get_experiment_by_name("MLOPS-exp1").experiment_id):
 
     # Log parameters
     mlflow.log_param("n_estimators", n_estimator)
